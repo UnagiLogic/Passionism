@@ -1,3 +1,5 @@
+import { Client as _Client } from 'https://deno.land/x/postgres@v0.17.0/mod.ts';
+
 export function add(a: number, b: number): number {
   return a + b;
 }
