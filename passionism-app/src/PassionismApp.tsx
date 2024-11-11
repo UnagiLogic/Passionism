@@ -15,13 +15,13 @@ function PassionismApp() {
     <>
       <h1>Passionism</h1>
       <div className="passionism-app">
+        <ActionBox />
         <MainScreen />
         <div className="huds"> {/* Container for HUDs */}
             <TimeHUD />
             <AttributeHUD />
             <UniHUD />
         </div>
-        <ActionBox />
       </div>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
