@@ -5,38 +5,46 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
 .card {
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
+.main-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: #242424;
+
+  .game-info {
+    padding: 20px;
+    background-color: #6d0870;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    /* ... other styles */
+  }
+
+  .background {
+    flex: 1;
+    background-image: url('path/to/background.jpg');
+    background-size: cover;
+    /* ... other styles */
+  }
+
+  .character-portrait {
+    width: 200px;
+    height: 200px;
+    background-image: url('path/to/character.jpg');
+    background-size: cover;
+    /* ... other styles */
+  }
 }

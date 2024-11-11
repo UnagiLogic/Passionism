@@ -13,16 +13,7 @@ function PassionismApp() {
 
   return (
     <>
-      <h1>Game Dev</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-
-      </div>
-      <p className="read-the-docs">
-        This is just here as a placeholder
-      </p>
+      <h1>Passionism</h1>
       <div className="passionism-app">
         <MainScreen />
         <div className="huds"> {/* Container for HUDs */}
@@ -31,6 +22,11 @@ function PassionismApp() {
             <UniHUD />
         </div>
         <ActionBox />
+      </div>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
       </div>
     </>
   )
