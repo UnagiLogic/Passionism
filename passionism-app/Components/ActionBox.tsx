@@ -53,17 +53,22 @@ const handleClick = (action: string) => {
     // If the player has 0 sleep deprivation days, the sleep action will instead give a buff during sleep.
     // The buff will increase the player's mood by 1, focus by 1, and creativity by 1 and memory but .01.
   } else if (action === 'Sleep') {
-    // Calculate new time based on current time + 8 hours (480 minutes)
-    const newTime = (current_time + 480) % 1440; // 1440 minutes in a day
+    let newDay = current_day;
+    if (current_time + 8 >= 24) {
+      newDay++;
+    }
+
+    const newTime = ((current_time) + 8) % 24; // 1440 minutes in a day
     dispatch(updateTime(newTime));
 
     // Increment the day if the new time is past midnight (0)
-    if (newTime < current_time) {
+    if (newDay > current_day) {
+      console.log('Incrementing day');
       dispatch(incrementDay());
     }
 
     if (current_time === 0) { // Start of a new day
-      if (sleep_duration < 480) {
+      if (sleep_duration < 8) {
         // Apply sleep deprivation debuffs
       } else {
         // Apply sleep benefits
@@ -72,7 +77,9 @@ const handleClick = (action: string) => {
   }
 
     // reduce sleep deprivation days by 1 (if not already at 0)
-    dispatch(updateSleepDeprivationDays(sleep_deprivation_days - 1));
+    if (sleep_deprivation_days > 0) {
+      dispatch(updateSleepDeprivationDays(Math.max(0, sleep_deprivation_days - 1)));
+    }
   
     
     // Increase memory level (if not already at max)
