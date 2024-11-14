@@ -11,6 +11,8 @@ interface GameState {
   memory_level: number;
   sleep_duration: number;
   sleep_deprivation_days: number;
+  sleep_deprivation_level: number;
+  sleep_buff_duration: number;
 }
 
 const initialState: GameState = {
@@ -24,6 +26,8 @@ const initialState: GameState = {
   memory_level: 0,
   sleep_duration: 0,
   sleep_deprivation_days: 0,
+  sleep_deprivation_level: 0,
+  sleep_buff_duration: 1440, 
 };
 
 export const gameSlice = createSlice({
@@ -58,10 +62,16 @@ export const gameSlice = createSlice({
       state.memory_level = action.payload;
     },
     updateSleepDuration: (state, action: PayloadAction<number>) => {
-      state.sleep_duraction = action.payload;
+      state.sleep_duration = action.payload;
     },
     updateSleepDeprivationDays: (state, action: PayloadAction<number>) => {
       state.sleep_deprivation_days = action.payload;
+    },
+    updateSleepDeprivationLevel: (state, action: PayloadAction<number>) => {
+      state.sleep_deprivation_level = action.payload;
+    },
+    updateSleepBuffDuration: (state, action: PayloadAction<number>) => {
+      state.sleep_buff_duration = action.payload;
     },
     // ... other reducers for skills, inventory, etc.
   },
@@ -79,6 +89,8 @@ export const {
   updateMemoryLevel,
   updateSleepDuration,
   updateSleepDeprivationDays,
+  updateSleepDeprivationLevel,
+  updateSleepBuffDuration,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

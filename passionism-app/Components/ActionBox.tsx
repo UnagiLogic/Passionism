@@ -13,7 +13,10 @@ import {
   updateFocus,
   updateCreativity,
   updateMemoryLevel,
+  updateSleepDuration,
   updateSleepDeprivationDays,
+  updateSleepDeprivationLevel,
+  updateSleepBuffDuration,
 } from '../src/gameSlice';
 import { RootState } from '../store';
 
@@ -30,6 +33,8 @@ function ActionBox() {
   const memory_level = useSelector((state: RootState) => state.game.memory_level);
   const sleep_duration = useSelector((state: RootState) => state.game.sleep_duration);
   const sleep_deprivation_days = useSelector((state: RootState) => state.game.sleep_deprivation_days);
+  const sleep_deprivation_level = useSelector((state: RootState) => state.game.sleep_deprivation_level);
+  const sleep_buff_duration = useSelector((state: RootState) => state.game.sleep_buff_duration);
 
 const handleClick = (action: string) => {
   if (action === 'Work') {
@@ -45,46 +50,58 @@ const handleClick = (action: string) => {
   } else if (action === 'Social Interaction') {
     dispatch(updateTime(current_time + 4));
   
-    // Sleep action checks if player has used sleep today
-    // it checks how much time is left in the day and a pop up message will appear if the player still has enough time to do an action.
-    // The player can choose not to sleep, but it will increase sleep deprivation days by 1 and memory level will decrease by .01.
-    // If the player chooses to sleep, the time will be increased by 8 hours (480 minutes) and the day will be incremented if the new time is past midnight.
-    // Sleep deprivation days will be reduced by 1 and memory level will be increased by .01 (if not already at max).
-    // If the player has 0 sleep deprivation days, the sleep action will instead give a buff during sleep.
-    // The buff will increase the player's mood by 1, focus by 1, and creativity by 1 and memory but .01.
   } else if (action === 'Sleep') {
-    let newDay = current_day;
-    if (current_time + 8 >= 24) {
-      newDay++;
-    }
+    // Get desired sleep duration from the player (in hours)
+    const sleepHoursInput = prompt("How many hours do you want to sleep? (Enter a number)");
+    const sleepHours = parseFloat(sleepHoursInput || "0"); // Parse input as a number
 
-    const newTime = ((current_time) + 8) % 24; // 1440 minutes in a day
-    dispatch(updateTime(newTime));
+    if (!isNaN(sleepHours) && sleepHours > 0) { // Validate input
+      const sleepMinutes = sleepHours * 60;
 
-    // Increment the day if the new time is past midnight (0)
-    if (newDay > current_day) {
-      console.log('Incrementing day');
-      dispatch(incrementDay());
-    }
+      // Calculate new time in minutes
+      const newTimeMinutes = (current_time * 60 + sleep_duration + sleepMinutes) % 1440; // 1440 minutes in a day
 
-    if (current_time === 0) { // Start of a new day
-      if (sleep_duration < 8) {
-        // Apply sleep deprivation debuffs
-      } else {
+      // Update time in the store (convert back to hours for display)
+      dispatch(updateTime(Math.floor(newTimeMinutes / 60)));
+
+      // Check if the day has changed BEFORE updating sleep_duration
+      const newDay = current_day + (newTimeMinutes < current_time * 60 ? 1 : 0); 
+
+      // Update sleep duration
+      dispatch(updateSleepDuration(sleep_duration + sleepMinutes));
+
+      // Calculate sleep deprivation level
+      const newSleepDeprivationLevel = Math.max(0, 1 - ((sleep_duration + sleepMinutes) / 480));
+      dispatch(updateSleepDeprivationLevel(newSleepDeprivationLevel));
+
+      // Apply sleep benefits or debuffs based on sleep_duration
+      // ... adjust benefits based on sleep duration or sleep quality
+      if (sleep_duration + sleepMinutes >= 480) { // Check for at least 8 hours of sleep
         // Apply sleep benefits
-    }
-    dispatch(updateSleepDuration(0)); // Reset sleep duration
-  }
+        if (sleep_deprivation_days > 0) {
+          dispatch(updateSleepDeprivationDays(Math.max(0, sleep_deprivation_days - 1)));
+        }
+        if (memory_level < 3) {
+          dispatch(updateMemoryLevel(memory_level + .1));
+        }
+        // ... other benefits (mood, focus, creativity)
+      } else {
+        // Apply sleep deprivation debuffs
+        dispatch(updateSleepDeprivationDays(sleep_deprivation_days + 1));
+        // ... other debuffs
 
-    // reduce sleep deprivation days by 1 (if not already at 0)
-    if (sleep_deprivation_days > 0) {
-      dispatch(updateSleepDeprivationDays(Math.max(0, sleep_deprivation_days - 1)));
-    }
-  
-    
-    // Increase memory level (if not already at max)
-    if (memory_level < 3) {
-      dispatch(updateMemoryLevel(memory_level + 1));
+        // Reset sleep buff duration (or adjust based on nap duration)
+        dispatch(updateSleepBuffDuration(1440)); 
+
+        // Update day if necessary
+        dispatch(updateDay(newDay));
+
+        // Console log everything for debugging
+        console.log("New time:", newTimeMinutes);
+        console.log("What day is it?:", "Day" + " " + current_day);
+      }
+    } else {
+      alert("Invalid sleep duration. Please enter a valid number.");
     }
   }
 };

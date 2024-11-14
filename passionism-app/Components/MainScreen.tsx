@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 function MainScreen() {
-  const { current_time, current_day, basic_uni, luxury_uni, mood, focus, creativity, memory_level, sleep_duration, sleep_deprivation_days } = useSelector((state: RootState) => state.game);
+  const { current_time, current_day, basic_uni, luxury_uni, mood, focus, creativity, memory_level, sleep_duration, sleep_deprivation_days, sleep_deprivation_level, sleep_buff_duration } = useSelector((state: RootState) => state.game);
 
   return (
     <div className="main-screen">
@@ -21,6 +21,9 @@ function MainScreen() {
         <p>Memory Level: {memory_level}</p>
         <p>Sleep Duration: {sleep_duration}</p>
         <p>Sleep Deprivation Days: {sleep_deprivation_days}</p>
+        <p>Sleep Deprivation Level: {sleep_deprivation_level}</p>
+        <p>Sleep Buff Duration: {sleep_buff_duration}</p>
+
         {/* ... other game info */}
       </div>
 
