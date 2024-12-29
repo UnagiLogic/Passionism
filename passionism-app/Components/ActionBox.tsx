@@ -13,6 +13,7 @@ import {
   updateFocus,
   updateCreativity,
   updateMemoryLevel,
+  increaseSleep,
   updateSleepDuration,
   updateSleepDeprivationDays,
   updateSleepDeprivationLevel,
@@ -40,6 +41,8 @@ const handleClick = (action: string) => {
   if (action === 'Work') {
     dispatch(updateBasicUni(basic_uni + 50));
     dispatch(updateTime(current_time + 8));
+    // decrease sleep by 1
+    dispatch(decreaseSleep(1));
   
   } else if (action === 'Leisure') {
     dispatch(updateTime(current_time + 4));
@@ -55,11 +58,12 @@ const handleClick = (action: string) => {
     const sleepHoursInput = prompt("How many hours do you want to sleep? (Enter a number)");
     const sleepHours = parseFloat(sleepHoursInput || "0"); // Parse input as a number
 
-    if (!isNaN(sleepHours) && sleepHours > 0) { // Validate input
+    // The if statement checks if the input is a valid number and greater than 0
+    if (!isNaN(sleepHours) && sleepHours > 0) {
       const sleepMinutes = sleepHours * 60;
 
-      // Calculate new time in minutes
-      const newTimeMinutes = (current_time * 60 + sleep_duration + sleepMinutes) % 1440; // 1440 minutes in a day
+      // Calculates new time after sleeping
+      const newTimeMinutes = (current_time * 60 + sleep_duration + sleepMinutes) % 1440;
 
       // Update time in the store (convert back to hours for display)
       dispatch(updateTime(Math.floor(newTimeMinutes / 60)));
@@ -70,19 +74,21 @@ const handleClick = (action: string) => {
       // Update sleep duration
       dispatch(updateSleepDuration(sleep_duration + sleepMinutes));
 
+      // Dispatch increaseSleep
+      dispatch(increaseSleep(sleepMinutes));
+
       // Calculate sleep deprivation level
       const newSleepDeprivationLevel = Math.max(0, 1 - ((sleep_duration + sleepMinutes) / 480));
       dispatch(updateSleepDeprivationLevel(newSleepDeprivationLevel));
 
-      // Apply sleep benefits or debuffs based on sleep_duration
-      // ... adjust benefits based on sleep duration or sleep quality
-      if (sleep_duration + sleepMinutes >= 480) { // Check for at least 8 hours of sleep
+      // Check if the player has slept for at least 1 hour
+      if (sleep_duration + sleepMinutes >= 60) {
         // Apply sleep benefits
         if (sleep_deprivation_days > 0) {
           dispatch(updateSleepDeprivationDays(Math.max(0, sleep_deprivation_days - 1)));
         }
         if (memory_level < 3) {
-          dispatch(updateMemoryLevel(memory_level + .1));
+          dispatch(updateMemoryLevel(parseFloat((memory_level + 0.1).toFixed(1))));
         }
         // ... other benefits (mood, focus, creativity)
       } else {

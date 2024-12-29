@@ -10,6 +10,8 @@ import TimeHUD from '../components/TimeHUD'
 import UniHUD from '../components/UniHUD'
 import './App.css'
 import { updateSleepDuration, updateSleepBuffDuration } from '../src/gameSlice'
+import SleepDisplay from '../components/SleepDisplay'
+import { decreaseSleep } from '../src/gameSlice'
 
 function PassionismApp() {
   const dispatch = useDispatch();
@@ -18,6 +20,8 @@ function PassionismApp() {
   const sleep_duration = useSelector((state: RootState) => state.game.sleep_duration);
   const sleep_buff_duration = useSelector((state: RootState) => state.game.sleep_buff_duration);
   const sleep_deprivation_days = useSelector((state: RootState) => state.game.sleep_deprivation_days);
+
+
 
   useEffect(() => {
     if (current_time === 0) { // Start of a new day
@@ -51,12 +55,32 @@ function PassionismApp() {
 
   }, [current_time, sleep_duration, sleep_deprivation_days, sleep_buff_duration, dispatch]); // Dependencies
 
+  useEffect(() => {
+    // This is the new useEffect hook for decreasing sleep over time
+    const sleepInterval = setInterval(() => {
+      dispatch(decreaseSleep(1)); // Decrease sleep by 1 every second (adjust as needed)
+    }, 1000); // 1000 milliseconds = 1 second
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(sleepInterval); 
+  }, [dispatch]); // Include dispatch as a dependency
+
+  useEffect(() => {
+    // This effect will decrement the sleep buff duration every minute
+    const buffInterval = setInterval(() => {
+      dispatch(updateSleepBuffDuration(Math.max(0, sleep_buff_duration - 1))); 
+    }, 60000); // 60000 milliseconds = 1 minute
+  
+    return () => clearInterval(buffInterval);
+  }, [dispatch, sleep_buff_duration]); // Include sleep_buff_duration as a dependency
+
   return (
     <>
       <h1>Passionism</h1>
       <div className="passionism-app">
         <ActionBox />
         <MainScreen />
+        <SleepDisplay />
         <div className="huds"> {/* Container for HUDs */}
             <TimeHUD />
             <AttributeHUD />

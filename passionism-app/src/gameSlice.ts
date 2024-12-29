@@ -9,6 +9,7 @@ interface GameState {
   focus: number;
   creativity: number;
   memory_level: number;
+  sleep: number;
   sleep_duration: number;
   sleep_deprivation_days: number;
   sleep_deprivation_level: number;
@@ -24,6 +25,7 @@ const initialState: GameState = {
   focus: 50,
   creativity: 50,
   memory_level: 0,
+  sleep: 8,
   sleep_duration: 0,
   sleep_deprivation_days: 0,
   sleep_deprivation_level: 0,
@@ -61,6 +63,18 @@ export const gameSlice = createSlice({
     updateMemoryLevel: (state, action: PayloadAction<number>) => {
       state.memory_level = action.payload;
     },
+    decreaseSleep: (state, action: PayloadAction<number>) => {
+      state.sleep -= action.payload; // Decrease sleep by the given amount
+      if (state.sleep < 0) {
+        state.sleep = 0; // Prevent sleep from going below 0
+      }
+    },
+    increaseSleep: (state, action: PayloadAction<number>) => {
+      state.sleep += action.payload; // Increase sleep by the given amount
+      if (state.sleep > 24) {
+        state.sleep = 24; // Prevent sleep from going above 24
+      }
+    },
     updateSleepDuration: (state, action: PayloadAction<number>) => {
       state.sleep_duration = action.payload;
     },
@@ -87,6 +101,8 @@ export const {
   updateFocus,
   updateCreativity,
   updateMemoryLevel,
+  decreaseSleep,
+  increaseSleep,
   updateSleepDuration,
   updateSleepDeprivationDays,
   updateSleepDeprivationLevel,
