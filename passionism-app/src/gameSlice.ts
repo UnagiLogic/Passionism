@@ -1,35 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface GameState {
-  current_time: number;
-  current_day: number;
-  basic_uni: number;
-  luxury_uni: number;
-  mood: number;
-  focus: number;
-  creativity: number;
-  memory_level: number;
-  sleep: number;
-  sleep_duration: number;
-  sleep_deprivation_days: number;
-  sleep_deprivation_level: number;
-  sleep_buff_duration: number;
+currentTime: Date;
+timeSpentSleeping: number;
+sleepStartTime?: Date;
+health: number;
+mana: number;
+focus: number;
 }
 
 const initialState: GameState = {
-  current_time: 8,
-  current_day: 1,
-  basic_uni: 100,
-  luxury_uni: 50,
-  mood: 50,
-  focus: 50,
-  creativity: 50,
-  memory_level: 0,
-  sleep: 8,
-  sleep_duration: 0,
-  sleep_deprivation_days: 0,
-  sleep_deprivation_level: 0,
-  sleep_buff_duration: 1440, 
+currentTime: new Date(),
+timeSpentSleeping: 0,
+sleepStartTime: undefined,
+health: 100,
+mana: 50,
+focus: 80,
 };
 
 export const gameSlice = createSlice({
@@ -37,76 +23,34 @@ export const gameSlice = createSlice({
   initialState,
   reducers: {
     updateTime: (state, action: PayloadAction<number>) => {
-      state.current_time = action.payload;
+      state.currentTime = action.payload;
+      },
+      sleep: (state) => {
+        if (state.sleepStartTime === undefined) {
+          // If not already sleeping, record the sleep start time
+          state.sleepStartTime = new Date();
+        } else {
+          // If waking up, calculate time spent sleeping and update state
+          const wakeUpTime = new Date();
+          const timeDiff = wakeUpTime.getTime() - state.sleepStartTime.getTime(); // Difference in milliseconds
+          state.timeSpentSleeping += Math.floor(timeDiff / 1000); // Convert to seconds and add to total
+          state.currentTime = wakeUpTime;
+          state.sleepStartTime = undefined; // Reset sleepStartTime
+  
+          // Apply stat benefits
+          state.health += 20;
+          state.mana += 10;
+          state.focus += 15;
+
+          // ... other reducers for skills, inventory, etc.
+        }
+      },
     },
-    updateDay: (state, action: PayloadAction<number>) => {
-      state.current_day = action.payload;
-    },
-    incrementDay: (state) => {
-      state.current_day += 1;
-    },
-    updateBasicUni: (state, action: PayloadAction<number>) => {
-      state.basic_uni = action.payload;
-    },
-    updateLuxuryUni: (state, action: PayloadAction<number>) => {
-      state.luxury_uni = action.payload;
-    },
-    updateMood: (state, action: PayloadAction<number>) => {
-      state.mood = action.payload;
-    },
-    updateFocus: (state, action: PayloadAction<number>) => {
-      state.focus = action.payload;
-    },
-    updateCreativity: (state, action: PayloadAction<number>) => {
-      state.creativity = action.payload;
-    },
-    updateMemoryLevel: (state, action: PayloadAction<number>) => {
-      state.memory_level = action.payload;
-    },
-    decreaseSleep: (state, action: PayloadAction<number>) => {
-      state.sleep -= action.payload; // Decrease sleep by the given amount
-      if (state.sleep < 0) {
-        state.sleep = 0; // Prevent sleep from going below 0
-      }
-    },
-    increaseSleep: (state, action: PayloadAction<number>) => {
-      state.sleep += action.payload; // Increase sleep by the given amount
-      if (state.sleep > 24) {
-        state.sleep = 24; // Prevent sleep from going above 24
-      }
-    },
-    updateSleepDuration: (state, action: PayloadAction<number>) => {
-      state.sleep_duration = action.payload;
-    },
-    updateSleepDeprivationDays: (state, action: PayloadAction<number>) => {
-      state.sleep_deprivation_days = action.payload;
-    },
-    updateSleepDeprivationLevel: (state, action: PayloadAction<number>) => {
-      state.sleep_deprivation_level = action.payload;
-    },
-    updateSleepBuffDuration: (state, action: PayloadAction<number>) => {
-      state.sleep_buff_duration = action.payload;
-    },
-    // ... other reducers for skills, inventory, etc.
-  },
-});
+  });
+    
 
 export const { 
-  updateTime, 
-  updateDay,
-  incrementDay,
-  updateBasicUni,
-  updateLuxuryUni,
-  updateMood,
-  updateFocus,
-  updateCreativity,
-  updateMemoryLevel,
-  decreaseSleep,
-  increaseSleep,
-  updateSleepDuration,
-  updateSleepDeprivationDays,
-  updateSleepDeprivationLevel,
-  updateSleepBuffDuration,
+updateTime,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
