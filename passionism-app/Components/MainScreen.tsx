@@ -5,6 +5,7 @@ function MainScreen() {
   return (
     <div className="main-screen">
       {/* Core Game Information */}
+      <p>Main Screen Placeholder</p>
       <div className="game-info">
 
         {/* ... other game info */}

@@ -1,21 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface GameState {
-currentTime: Date;
+currentTime: number;
 timeSpentSleeping: number;
-sleepStartTime?: Date;
+sleepStartTime?: number;
+isSleeping: boolean;
 health: number;
 mana: number;
 focus: number;
 }
 
 const initialState: GameState = {
-currentTime: new Date(),
+currentTime: new Date().getTime(),
 timeSpentSleeping: 0,
 sleepStartTime: undefined,
+isSleeping: false,
 health: 100,
 mana: 50,
 focus: 80,
+};
+
+const applyStatBenefits = (state: GameState) => {
+  // Apply stat benefits from sleeping
+  state.health += 5;
+  state.mana += 10;
+  state.focus += 15;
 };
 
 export const gameSlice = createSlice({
@@ -25,32 +34,31 @@ export const gameSlice = createSlice({
     updateTime: (state, action: PayloadAction<number>) => {
       state.currentTime = action.payload;
       },
-      sleep: (state) => {
-        if (state.sleepStartTime === undefined) {
-          // If not already sleeping, record the sleep start time
-          state.sleepStartTime = new Date();
-        } else {
-          // If waking up, calculate time spent sleeping and update state
-          const wakeUpTime = new Date();
-          const timeDiff = wakeUpTime.getTime() - state.sleepStartTime.getTime(); // Difference in milliseconds
-          state.timeSpentSleeping += Math.floor(timeDiff / 1000); // Convert to seconds and add to total
-          state.currentTime = wakeUpTime;
-          state.sleepStartTime = undefined; // Reset sleepStartTime
+
+    sleep: (state) => {
+      state.isSleeping = !state.isSleeping; // Toggle sleep state
   
-          // Apply stat benefits
-          state.health += 20;
-          state.mana += 10;
-          state.focus += 15;
+      if (state.isSleeping) {
+        // If going to sleep, record start time
+        state.sleepStartTime = new Date().getTime();
+      } else {
+        // If waking up, update time spent sleeping and current time
+        const wakeUpTime = new Date();
+        const sleepStartTimeMs =
+          typeof state.sleepStartTime === "number"
+            ? state.sleepStartTime
+            : 0;
+        const sleepDurationMs = wakeUpTime.getTime() - sleepStartTimeMs;
+        state.timeSpentSleeping += Math.floor(sleepDurationMs / 1000);
+        state.currentTime = wakeUpTime.getTime();
+        state.sleepStartTime = undefined;
 
-          // ... other reducers for skills, inventory, etc.
-        }
-      },
+        applyStatBenefits(state); // Apply stat benefits from sleeping
+      }
     },
-  });
+  },
+});
     
-
-export const { 
-updateTime,
-} = gameSlice.actions;
+export const { updateTime, sleep } = gameSlice.actions;
 
 export default gameSlice.reducer;

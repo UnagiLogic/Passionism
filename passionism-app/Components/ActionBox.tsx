@@ -1,14 +1,13 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  updateTime,
-} from '../src/gameSlice';
-import { RootState } from '../store';
-
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { sleep } from '../src/gameSlice';
+import SleepScreen from '../components/SleepScreen';
 
 function ActionBox() {
   const dispatch = useDispatch();
-  const currentTime = useSelector((state: RootState) => state.game.currentTime);
+  const [showSleepConfirmation, setShowSleepConfirmation] = useState(false);
+  const [showSleepScreen, setShowSleepScreen] = useState(false); // State to control SleepScreen visibility
 
 const handleClick = (action: string) => {
   if (action === 'Work') {
@@ -20,8 +19,19 @@ const handleClick = (action: string) => {
   } else if (action === 'Social Interaction') {
     console.log('Social Interaction action clicked');
   } else if (action === 'Bed') {
-    console.log('Sleep action clicked');
+    setShowSleepConfirmation(true); // Show Sleep Confirmation prompt
+    console.log("Player is going to bed", {sleep});
   }
+};
+
+const handleSleepConfirm = () => {
+  dispatch(sleep()); // Dispatch sleep action
+  setShowSleepConfirmation(false); // Hide Sleep Confirmation prompt
+  setShowSleepScreen(true); // Show SleepScreen component
+};
+
+const handleSleepCancel = () => {
+  setShowSleepConfirmation(false); // Hide Sleep Confirmation prompt
 };
 
   return (
@@ -32,6 +42,18 @@ const handleClick = (action: string) => {
       <button onClick={() => handleClick('Skill Development')}>Skill Development</button>
       <button onClick={() => handleClick('Social Interaction')}>Social Interaction</button>
       <button onClick={() => handleClick('Bed')}>Bed</button>
+
+      {/* Sleep Confirmation prompt */}
+      {showSleepConfirmation && (
+        <div className="sleep-confirmation">
+          <p>Are you sure you want to go to bed?</p>
+          <button onClick={handleSleepConfirm}>Yes</button>
+          <button onClick={handleSleepCancel}>No</button>
+        </div>
+      )}
+
+      {/* SleepScreen component */}
+      {showSleepScreen && <SleepScreen />} {/* Render SleepScreen when showSleepScreen is true */}
     </div>
   );
 }
