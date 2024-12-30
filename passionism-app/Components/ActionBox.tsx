@@ -1,11 +1,11 @@
-import React from 'react'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { sleep } from '../src/gameSlice';
 import SleepScreen from '../components/SleepScreen';
 
 function ActionBox() {
   const dispatch = useDispatch();
+  const isSleeping = useSelector((state: RootState) => state.game.isSleeping);
   const [showSleepConfirmation, setShowSleepConfirmation] = useState(false);
   const [showSleepScreen, setShowSleepScreen] = useState(false); // State to control SleepScreen visibility
 
@@ -20,7 +20,6 @@ const handleClick = (action: string) => {
     console.log('Social Interaction action clicked');
   } else if (action === 'Bed') {
     setShowSleepConfirmation(true); // Show Sleep Confirmation prompt
-    console.log("Player is going to bed", {sleep});
   }
 };
 
@@ -32,6 +31,11 @@ const handleSleepConfirm = () => {
 
 const handleSleepCancel = () => {
   setShowSleepConfirmation(false); // Hide Sleep Confirmation prompt
+};
+
+const handleWakeUp = () => {
+  dispatch(sleep()); // Dispatch sleep action to toggle isSleeping
+  setShowSleepScreen(false); // Hide SleepScreen component
 };
 
   return (
@@ -53,7 +57,7 @@ const handleSleepCancel = () => {
       )}
 
       {/* SleepScreen component */}
-      {showSleepScreen && <SleepScreen />} {/* Render SleepScreen when showSleepScreen is true */}
+      {showSleepScreen && <SleepScreen handleWakeUp={handleWakeUp} />} {/* Render SleepScreen when showSleepScreen is true */}
     </div>
   );
 }

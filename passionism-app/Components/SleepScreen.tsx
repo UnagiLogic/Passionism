@@ -1,29 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
-import { sleep } from "../src/gameSlice"; // Assuming you have a sleep action to toggle sleep state
 
-function SleepScreen() {
-  const dispatch = useDispatch();
-  const isSleeping = useSelector((state: RootState) => state.game.isSleeping); // Assuming you have an isSleeping state
+function SleepScreen({ handleWakeUp }: { handleWakeUp: () => void }) {
+  const isSleeping = useSelector((state: RootState) => state.game.isSleeping); // Access isSleeping from Redux store
   const [timeSlept, setTimeSlept] = useState(0);
 
   useEffect(() => {
     let interval: NodeJS.Timer;
+
     if (isSleeping) {
       interval = setInterval(() => {
-        setTimeSlept((prevTime) => prevTime + 1); // Increment timeSlept every second
+        setTimeSlept((prevTime) => prevTime + 1);
       }, 1000);
     } else {
-      clearInterval(interval); // Clear interval when player wakes up
+      clearInterval(interval);
     }
-    return () => clearInterval(interval); // Cleanup on unmount
+  
+    return () => clearInterval(interval);
   }, [isSleeping]);
-
-  const handleWakeUp = () => {
-    dispatch(sleep()); // Dispatch action to toggle sleep state
-    console.log("Is player sleeping?", {isSleeping});
-  };
 
   return (
     <div className="sleep-screen">

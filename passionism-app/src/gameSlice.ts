@@ -36,25 +36,32 @@ export const gameSlice = createSlice({
       },
 
     sleep: (state) => {
-      state.isSleeping = !state.isSleeping; // Toggle sleep state
-  
-      if (state.isSleeping) {
-        // If going to sleep, record start time
-        state.sleepStartTime = new Date().getTime();
+      if (state.sleepStartTime === undefined) {
+        // If not already sleeping, record the sleep start time
+        state.sleepStartTime = new Date().getTime(); // Store as timestamp
       } else {
-        // If waking up, update time spent sleeping and current time
+        // If waking up, calculate time spent sleeping and update state
         const wakeUpTime = new Date();
+      
+        // Ensure state.sleepStartTime is a number before using it
         const sleepStartTimeMs =
           typeof state.sleepStartTime === "number"
             ? state.sleepStartTime
-            : 0;
-        const sleepDurationMs = wakeUpTime.getTime() - sleepStartTimeMs;
+            : 0; // Or handle the invalid type appropriately
+      
+        const sleepDurationMs =
+          wakeUpTime.getTime() - sleepStartTimeMs; // Difference in milliseconds
+      
+        // Convert sleep duration to seconds and add to total
         state.timeSpentSleeping += Math.floor(sleepDurationMs / 1000);
-        state.currentTime = wakeUpTime.getTime();
-        state.sleepStartTime = undefined;
-
+        state.currentTime = wakeUpTime.getTime(); // Store as timestamp
+        state.sleepStartTime = undefined; // Reset sleepStartTime
+      
         applyStatBenefits(state); // Apply stat benefits from sleeping
       }
+      
+      // Toggle the isSleeping state AFTER handling sleep/wake-up logic
+      state.isSleeping = !state.isSleeping; // Toggle sleep state
     },
   },
 });

@@ -1,9 +1,10 @@
 // This is the main component for the app.
 import React from 'react'
 import { useState} from 'react'
+import Researcher from '../components/Researcher'
 import ActionBox from '../components/ActionBox'
-import AttributeHUD from '../components/AttributeHUD'
 import MainScreen from '../components/MainScreen'
+import AttributeHUD from '../components/AttributeHUD'
 import TimeHUD from '../components/TimeHUD'
 import './App.css'
 
@@ -18,6 +19,7 @@ function PassionismApp() {
             <AttributeHUD />
       </div>
       <div className="passionism-app">
+        <Researcher />
         <ActionBox />
         <MainScreen />
       </div>
